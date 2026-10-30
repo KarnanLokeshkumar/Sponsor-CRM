@@ -1,0 +1,7 @@
+package com.sponsorcrm.controller;
+import com.sponsorcrm.entity.*; import com.sponsorcrm.repository.*; import jakarta.validation.Valid; import org.springframework.http.HttpStatus; import org.springframework.web.bind.annotation.*; import org.springframework.web.server.ResponseStatusException; import java.util.List;
+@RestController @RequestMapping("/api/deliverables") @CrossOrigin(origins="http://localhost:5173") public class DeliverableController { private final DeliverableRepository repo; private final CampaignRepository campaigns; public DeliverableController(DeliverableRepository r,CampaignRepository c){repo=r;campaigns=c;}
+ @GetMapping public List<Deliverable> all(){return repo.findAll();} @PostMapping public Deliverable create(@Valid @RequestBody Deliverable d){d.setCampaign(campaigns.findById(d.getCampaign().getId()).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"Campaign not found")));return repo.save(d);}
+ @PutMapping("/{id}") public Deliverable update(@PathVariable Long id,@Valid @RequestBody Deliverable d){Deliverable x=repo.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));x.setType(d.getType());x.setPlacement(d.getPlacement());x.setDescription(d.getDescription());x.setScheduledDate(d.getScheduledDate());x.setStatus(d.getStatus());x.setCampaign(campaigns.findById(d.getCampaign().getId()).orElseThrow());return repo.save(x);}
+ @DeleteMapping("/{id}") @ResponseStatus(HttpStatus.NO_CONTENT) public void delete(@PathVariable Long id){repo.deleteById(id);}
+}
