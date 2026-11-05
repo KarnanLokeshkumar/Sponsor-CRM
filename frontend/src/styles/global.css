@@ -3098,3 +3098,29 @@ td,
     padding: 18px;
   }
 } 
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 14px;
+  margin-top: 12px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: rgba(201, 130, 85, 0.12);
+  color: #c98255;
+}
+
+.sidebar.collapsed .logout-btn {
+  justify-content: center;
+  padding: 11px 0;
+}
