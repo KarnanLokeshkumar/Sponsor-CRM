@@ -9,9 +9,9 @@ import {
   Mail,
   Moon,
   ShieldCheck,
-  Sparkles,
   Sun,
 } from "lucide-react";
+import "../styles/Login.css";
 
 export default function Login({ onLogin, theme, onToggleTheme }) {
   const [email, setEmail] = useState("");
@@ -55,184 +55,129 @@ export default function Login({ onLogin, theme, onToggleTheme }) {
   }
 
   return (
-    <main
-      className={`login-page login-page-premium ${
-        theme === "dark" ? "login-dark" : "login-light"
-      }`}
-    >
-      {/* LEFT HERO SECTION */}
-      <section className="login-visual login-visual-premium">
-        <div className="login-visual-glow" />
+    <main className={`reference-login ${theme === "dark" ? "login-dark" : "login-light"}`}>
+      <div className="reference-login-background" />
 
-        <div className="login-brand login-brand-premium">
-          <span className="brand-mark">
-            <Handshake size={22} />
-          </span>
-          <b>SPONSOR CRM</b>
-        </div>
+      <header className="reference-brand">
+        <span className="reference-brand-icon">
+          <Handshake size={25} />
+        </span>
+        <b>SPONSOR CRM</b>
+      </header>
 
-       
-        <div className="visual-content visual-content-premium">
-          <span className="eyebrow">
-            <Sparkles size={14} />
-            PARTNERSHIPS, MADE POWERFUL
+      <section className="reference-hero">
+        <div className="reference-hero-copy">
+          <span className="reference-eyebrow">
+            A SPONSORSHIP CRM MADE POWERFUL
           </span>
 
           <h1>
             Build relationships.
             <br />
-            <em>Create impact.</em>
+            <span>Create impact.</span>
           </h1>
 
           <p>
-            A smarter workspace to discover opportunities, nurture sponsors
-            and build meaningful partnerships.
+            A smarter workspace to discover opportunities,
+            <br className="desktop-break" />
+            nurture sponsors and build meaningful partnerships.
           </p>
-        </div>
-
-        <div className="visual-stats visual-stats-premium">
-          <div>
-            <b>01</b>
-            <span>Connect</span>
-            <small>Find the right opportunities.</small>
-          </div>
-
-          <i />
-
-          <div>
-            <b>02</b>
-            <span>Collaborate</span>
-            <small>Work together seamlessly.</small>
-          </div>
-
-          <i />
-
-          <div>
-            <b>03</b>
-            <span>Grow</span>
-            <small>Create long-term value.</small>
-          </div>
-        </div>
-
-        <div className="visual-footer visual-footer-premium">
-          <span>© {new Date().getFullYear()} Sponsor CRM</span>
-
-          <span>
-            <ShieldCheck size={15} />
-            Secure | Reliable | Built for Partnerships
-          </span>
         </div>
       </section>
 
-      {/* RIGHT LOGIN SECTION */}
-      <section className="login-panel login-panel-premium">
+      <section className="reference-login-panel">
         <button
-          className="theme-toggle login-theme-toggle login-theme-toggle-premium"
+          className="reference-theme-toggle"
           type="button"
           onClick={onToggleTheme}
           aria-label="Toggle colour theme"
         >
           {theme === "light" ? <Moon size={17} /> : <Sun size={17} />}
-          <span>{theme === "light" ? "Dark Mode" : "Light Mode"}</span>
         </button>
 
-        <div className="login-form-wrap login-form-wrap-premium">
-          <div className="mobile-login-brand">
-            <span className="brand-mark">
-              <Handshake size={21} />
-            </span>
-            <b>SPONSOR CRM</b>
-          </div>
-
-          <span className="form-kicker">WELCOME BACK</span>
+        <div className="reference-login-card">
+          <span className="reference-form-kicker">WELCOME BACK</span>
 
           <h2>Sign in to your workspace</h2>
 
-          <p className="form-subtitle">
+          <p className="reference-form-subtitle">
             Enter your details to access your Sponsor CRM.
           </p>
 
           <form onSubmit={submit} noValidate>
-            <label className="field-label" htmlFor="login-email">
-              Email address
-            </label>
-
-            <div className="input-wrap input-wrap-premium">
-              <Mail size={19} />
+            <label className="reference-field">
+              <Mail size={20} />
 
               <input
-                id="login-email"
                 type="email"
                 autoComplete="username"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                placeholder="you@company.com"
+                placeholder="Email address"
+                aria-label="Email address"
                 required
               />
-            </div>
-
-            <label
-              className="field-label password-label"
-              htmlFor="login-password"
-            >
-              Password
             </label>
 
-            <div className="input-wrap input-wrap-premium">
-              <LockKeyhole size={19} />
+            <label className="reference-field">
+              <LockKeyhole size={20} />
 
               <input
-                id="login-password"
                 type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                placeholder="Enter your password"
+                placeholder="Password"
+                aria-label="Password"
                 required
               />
 
               <button
                 type="button"
-                className="password-visibility"
-                onClick={() =>
-                  setShowPassword((current) => !current)
-                }
+                className="reference-password-toggle"
+                onClick={() => setShowPassword((current) => !current)}
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                {showPassword ? (
-                  <EyeOff size={19} />
-                ) : (
-                  <Eye size={19} />
-                )}
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
-            </div>
+            </label>
 
             {error && (
-              <p className="form-error" role="alert">
+              <p className="reference-error" role="alert">
                 {error}
               </p>
             )}
 
-            <label className="remember-option">
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(event) => setRememberMe(event.target.checked)}
-              />
-              <span>Remember me</span>
-            </label>
+            <div className="reference-form-options">
+              <label className="reference-remember">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(event) => setRememberMe(event.target.checked)}
+                />
+                <span>Remember me</span>
+              </label>
+
+              <button
+                type="button"
+                className="reference-forgot"
+                onClick={() => setError("Please contact your administrator to reset your password.")}
+              >
+                Forgot password?
+              </button>
+            </div>
 
             <button
-              className="sign-in-button sign-in-button-premium"
+              className="reference-sign-in"
               type="submit"
               disabled={busy}
             >
-              {busy ? "Signing in..." : "Sign in"}
-              {!busy && <ArrowRight size={19} />}
+              <span>{busy ? "Signing in..." : "Sign In"}</span>
+              {!busy && <ArrowRight size={20} />}
             </button>
           </form>
 
-          <p className="login-legal login-legal-premium">
+          <p className="reference-login-legal">
             <ShieldCheck size={14} />
             Access to this workspace is restricted to authorised users only.
           </p>

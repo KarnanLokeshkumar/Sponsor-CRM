@@ -1,0 +1,526 @@
+/* ==========================================================
+   SPONSOR CRM — LOGIN PAGE
+   Reference design: Glowing blue globe + glass login card
+========================================================== */
+
+.reference-login {
+  --login-white: #f7faff;
+  --login-muted: #c0cde0;
+  --login-blue: #168cff;
+  --login-border: rgba(150, 205, 255, 0.32);
+
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: 64% 36%;
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #020b20;
+  color: var(--login-white);
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+}
+
+/* Full-screen artwork */
+
+.reference-login-background {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-image:
+    linear-gradient(
+      90deg,
+      rgba(1, 10, 30, 0.2) 0%,
+      rgba(1, 10, 30, 0.05) 55%,
+      rgba(1, 10, 30, 0.55) 100%
+    ),
+    url("/images/sponsor-login-hero-art.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.reference-login::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0, 8, 25, 0.3) 0%,
+      transparent 50%,
+      rgba(0, 8, 25, 0.3) 100%
+    ),
+    radial-gradient(
+      ellipse at 48% 50%,
+      transparent 20%,
+      rgba(0, 5, 20, 0.2) 100%
+    );
+}
+
+/* Branding */
+
+.reference-brand {
+  position: absolute;
+  z-index: 5;
+  top: 25px;
+  left: 36px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #fff;
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: 0.7px;
+}
+
+.reference-brand-icon {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  place-items: center;
+  border: 1px solid rgba(130, 205, 255, 0.4);
+  border-radius: 16px;
+  background: linear-gradient(145deg, #258eff, #0648d5);
+  box-shadow:
+    0 0 24px rgba(0, 124, 255, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+/* Hero section */
+
+.reference-hero {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 100vh;
+  padding: 120px 30px 80px 5.2%;
+}
+
+.reference-hero-copy {
+  max-width: 700px;
+  margin-top: -15px;
+}
+
+.reference-eyebrow {
+  display: inline-block;
+  margin-bottom: 23px;
+  color: #e0ebff;
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: 4px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+}
+
+.reference-hero h1 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(42px, 4.5vw, 68px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -2.4px;
+  text-shadow: 0 3px 20px rgba(0, 0, 0, 0.3);
+}
+
+.reference-hero h1 span {
+  color: #5ec5ff;
+  background: linear-gradient(90deg, #4baaff, #8be8ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.reference-hero p {
+  margin: 25px 0 0;
+  color: #e1eaff;
+  font-size: 16px;
+  line-height: 1.8;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* Login panel */
+
+.reference-login-panel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 30px 8%;
+}
+
+/* Theme toggle */
+
+.reference-theme-toggle {
+  position: absolute;
+  top: 25px;
+  right: 25px;
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 1px solid rgba(150, 205, 255, 0.22);
+  border-radius: 50%;
+  background: rgba(4, 24, 53, 0.75);
+  color: #d8eaff;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.reference-theme-toggle:hover {
+  border-color: #52baff;
+  box-shadow: 0 0 18px rgba(0, 145, 255, 0.25);
+}
+
+/* Glass login card */
+
+.reference-login-card {
+  position: relative;
+  width: 100%;
+  max-width: 475px;
+  padding: 46px 48px;
+  border: 1px solid rgba(145, 205, 255, 0.48);
+  border-radius: 27px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(10, 34, 67, 0.83),
+      rgba(3, 16, 37, 0.88)
+    );
+  box-shadow:
+    0 25px 75px rgba(0, 0, 0, 0.42),
+    0 0 35px rgba(0, 125, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+.reference-login-card::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 15%;
+  right: 15%;
+  height: 2px;
+  border-radius: 50%;
+  background: #65d8ff;
+  box-shadow: 0 0 18px 3px rgba(0, 166, 255, 0.65);
+}
+
+/* Form heading */
+
+.reference-form-kicker {
+  display: block;
+  margin-bottom: 17px;
+  color: #4db9ff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 4px;
+}
+
+.reference-login-card h2 {
+  margin: 0;
+  color: #f7faff;
+  font-size: clamp(27px, 2.1vw, 34px);
+  font-weight: 750;
+  line-height: 1.25;
+  letter-spacing: -0.9px;
+}
+
+.reference-form-subtitle {
+  margin: 13px 0 35px;
+  color: #c2cfe1;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* Input fields */
+
+.reference-field {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  min-height: 52px;
+  margin-bottom: 20px;
+  padding: 0 16px;
+  border: 1px solid rgba(155, 195, 245, 0.3);
+  border-radius: 13px;
+  background: linear-gradient(
+    120deg,
+    rgba(91, 127, 176, 0.24),
+    rgba(40, 70, 112, 0.22)
+  );
+  color: #d5e5fa;
+  transition: 0.2s ease;
+}
+
+.reference-field:focus-within {
+  border-color: #45b5ff;
+  background: rgba(35, 92, 160, 0.28);
+  box-shadow:
+    0 0 0 3px rgba(0, 142, 255, 0.1),
+    0 0 20px rgba(0, 142, 255, 0.12);
+}
+
+.reference-field > svg {
+  flex-shrink: 0;
+}
+
+.reference-field input {
+  width: 100%;
+  min-width: 0;
+  padding: 15px 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.reference-field input::placeholder {
+  color: #bdcbe0;
+  opacity: 1;
+}
+
+/* Password eye button */
+
+.reference-password-toggle {
+  display: grid;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #d5e5fa;
+  cursor: pointer;
+}
+
+.reference-password-toggle:hover {
+  background: rgba(110, 175, 255, 0.15);
+  color: #fff;
+}
+
+/* Remember me and forgot password */
+
+.reference-form-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 1px 0 25px;
+}
+
+.reference-remember {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #e0eaff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.reference-remember input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: #168cff;
+  cursor: pointer;
+}
+
+.reference-forgot {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #c4d3e8;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.reference-forgot:hover {
+  color: #66c7ff;
+}
+
+/* Sign-in button */
+
+.reference-sign-in {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  width: 100%;
+  min-height: 56px;
+  border: 1px solid rgba(115, 195, 255, 0.45);
+  border-radius: 13px;
+  background: linear-gradient(
+    100deg,
+    #279dff 0%,
+    #1269f4 55%,
+    #073fd0 100%
+  );
+  color: #fff;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 750;
+  box-shadow:
+    0 8px 26px rgba(0, 105, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.reference-sign-in:hover:not(:disabled) {
+  filter: brightness(1.12);
+  box-shadow:
+    0 10px 32px rgba(0, 130, 255, 0.4),
+    0 0 20px rgba(0, 160, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.reference-sign-in:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Error message */
+
+.reference-error {
+  margin: 0 0 15px;
+  padding: 11px 13px;
+  border: 1px solid rgba(255, 115, 140, 0.4);
+  border-radius: 10px;
+  background: rgba(120, 20, 45, 0.3);
+  color: #ffc0cb;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* Security text */
+
+.reference-login-legal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 25px 0 0;
+  color: #a8bdd9;
+  font-size: 10px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+.reference-login-legal svg {
+  flex-shrink: 0;
+  color: #55bfff;
+}
+
+/* Responsive */
+
+@media (max-width: 1100px) {
+  .reference-login {
+    grid-template-columns: 58% 42%;
+  }
+
+  .reference-hero {
+    padding-left: 5%;
+  }
+
+  .reference-hero h1 {
+    font-size: clamp(38px, 4.5vw, 52px);
+  }
+
+  .reference-login-panel {
+    padding: 25px 6%;
+  }
+
+  .reference-login-card {
+    padding: 36px 30px;
+  }
+}
+
+@media (max-width: 800px) {
+  .reference-login {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .reference-login-background {
+    background-position: 58% center;
+  }
+
+  .reference-brand {
+    top: 20px;
+    left: 20px;
+    font-size: 18px;
+  }
+
+  .reference-brand-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 13px;
+  }
+
+  .reference-hero {
+    display: none;
+  }
+
+  .reference-login-panel {
+    flex: 1;
+    min-height: 100vh;
+    padding: 90px 20px 30px;
+  }
+
+  .reference-login-card {
+    max-width: 480px;
+    padding: 34px 28px;
+  }
+
+  .reference-theme-toggle {
+    top: 20px;
+    right: 20px;
+  }
+}
+
+@media (max-width: 420px) {
+  .reference-login-card {
+    padding: 28px 21px;
+    border-radius: 21px;
+  }
+
+  .reference-login-card h2 {
+    font-size: 27px;
+  }
+
+  .reference-form-subtitle {
+    margin-bottom: 27px;
+  }
+
+  .reference-form-options {
+    flex-wrap: wrap;
+  }
+
+  .reference-field {
+    min-height: 50px;
+    padding: 0 12px;
+  }
+
+  .reference-sign-in {
+    min-height: 53px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reference-login *,
+  .reference-login *::before,
+  .reference-login *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
