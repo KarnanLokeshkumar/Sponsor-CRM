@@ -524,3 +524,142 @@
     animation: none !important;
   }
 }
+/* ===== Keep the background artwork visible ===== */
+
+.reference-login-background {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-image:
+    linear-gradient(
+      90deg,
+      rgba(2, 10, 30, 0.05) 0%,
+      rgba(2, 10, 30, 0.08) 55%,
+      rgba(2, 10, 30, 0.12) 100%
+    ),
+    url("/images/sponsor-login-hero-art.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.reference-login::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 8, 25, 0.04) 0%,
+    rgba(0, 8, 25, 0.02) 55%,
+    rgba(0, 8, 25, 0.12) 100%
+  );
+}
+
+/* ===== More transparent glass login card ===== */
+
+.reference-login-card {
+  position: relative;
+  width: 100%;
+  max-width: 475px;
+  padding: 46px 48px;
+
+  border: 1px solid rgba(190, 225, 255, 0.42);
+  border-radius: 27px;
+
+  /* Transparent glass — not an opaque dark panel */
+  background: linear-gradient(
+    135deg,
+    rgba(30, 75, 130, 0.28),
+    rgba(5, 20, 48, 0.38)
+  );
+
+  box-shadow:
+    0 20px 65px rgba(0, 0, 0, 0.22),
+    0 0 35px rgba(0, 140, 255, 0.12),
+    inset 0 1px 1px rgba(255, 255, 255, 0.22);
+
+  backdrop-filter: blur(10px) saturate(145%);
+  -webkit-backdrop-filter: blur(10px) saturate(145%);
+}
+
+/* Glowing top edge */
+
+.reference-login-card::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 15%;
+  right: 15%;
+  height: 2px;
+  border-radius: 50%;
+  background: #8be8ff;
+  box-shadow: 0 0 20px 4px rgba(0, 166, 255, 0.65);
+}
+
+/* ===== Glass input fields ===== */
+
+.reference-field {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  min-height: 52px;
+  margin-bottom: 20px;
+  padding: 0 16px;
+
+  border: 1px solid rgba(190, 220, 255, 0.32);
+  border-radius: 13px;
+
+  background: rgba(145, 190, 245, 0.10);
+  color: #e8f4ff;
+
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+
+  transition: 0.2s ease;
+}
+
+.reference-field:focus-within {
+  border-color: rgba(95, 195, 255, 0.9);
+  background: rgba(100, 170, 255, 0.16);
+  box-shadow:
+    0 0 0 3px rgba(0, 142, 255, 0.12),
+    0 0 18px rgba(0, 142, 255, 0.18);
+}
+
+/* ===== Text clarity on glass ===== */
+
+.reference-login-card h2 {
+  color: #ffffff;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+.reference-form-subtitle {
+  color: rgba(235, 244, 255, 0.88);
+}
+
+.reference-form-kicker {
+  color: #72d0ff;
+}
+
+.reference-field input {
+  color: #ffffff;
+}
+
+.reference-field input::placeholder {
+  color: rgba(235, 244, 255, 0.78);
+  opacity: 1;
+}
+
+/* ===== Glass theme toggle ===== */
+
+.reference-theme-toggle {
+  background: rgba(130, 180, 245, 0.12);
+  border: 1px solid rgba(190, 220, 255, 0.28);
+  color: #ffffff;
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
