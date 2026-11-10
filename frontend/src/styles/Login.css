@@ -523,8 +523,7 @@
     transition: none !important;
     animation: none !important;
   }
-}
-/* ===== Keep the background artwork visible ===== */
+}/* ===== Keep the background artwork visible ===== */
 
 .reference-login-background {
   position: absolute;

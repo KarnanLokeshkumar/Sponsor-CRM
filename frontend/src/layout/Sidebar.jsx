@@ -5,6 +5,8 @@ import {
   Handshake,
   ShieldCheck,
   LogOut,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react';
 
 import { modules } from '../data/modules';
@@ -24,10 +26,15 @@ export default function Sidebar({
   mobileOpen,
   onNavigate,
   onLogout,
+  onToggleCollapse,
 }) {
   const handleLogout = async () => {
     onNavigate?.();
     await onLogout?.();
+  };
+
+  const handleNavigation = () => {
+    onNavigate?.();
   };
 
   return (
@@ -35,38 +42,47 @@ export default function Sidebar({
       className={`sidebar ${collapsed ? 'collapsed' : ''} ${
         mobileOpen ? 'mobile-open' : ''
       }`}
+      aria-label="Main navigation"
     >
       {/* Brand */}
       <div className="brand-row">
-        <div className="brand-mark">
-          <Handshake size={21} />
+        <div className="brand-mark" aria-hidden="true">
+          <Handshake size={21} strokeWidth={2.2} />
         </div>
 
         {!collapsed && (
           <div className="brand-name">
             <b>SPONSOR CRM</b>
-            <small>WORKSPACE</small>
+            <small>PARTNERSHIP WORKSPACE</small>
           </div>
         )}
 
         <button
           type="button"
           className="sidebar-collapse"
-          title="Collapse sidebar"
-          aria-label="Collapse sidebar"
+          onClick={onToggleCollapse}
+          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-expanded={!collapsed}
         >
-          <ChevronLeft size={16} />
+          {collapsed ? (
+            <PanelLeftOpen size={17} />
+          ) : (
+            <PanelLeftClose size={17} />
+          )}
         </button>
       </div>
 
-      {/* Workspace Switch */}
+      {/* Workspace */}
       <div className="workspace-switch">
-        <div className="workspace-icon">CRM</div>
+        <div className="workspace-icon" aria-hidden="true">
+          <span>SC</span>
+        </div>
 
         {!collapsed && (
-          <div>
+          <div className="workspace-copy">
             <b>Workspace</b>
-            <small>Management</small>
+            <small>Management Portal</small>
           </div>
         )}
       </div>
@@ -96,16 +112,21 @@ export default function Sidebar({
                     key={item.key}
                     to={item.path}
                     end={item.path === '/'}
-                    onClick={onNavigate}
+                    onClick={handleNavigation}
+                    title={collapsed ? item.label : undefined}
+                    aria-label={item.label}
                     className={({ isActive }) =>
                       `nav-link ${isActive ? 'active' : ''}`
                     }
-                    title={collapsed ? item.label : undefined}
                   >
-                    <Icon size={17} />
+                    <span className="nav-icon">
+                      <Icon size={17} strokeWidth={1.9} />
+                    </span>
 
                     {!collapsed && (
-                      <span>{item.label}</span>
+                      <span className="nav-link-label">
+                        {item.label}
+                      </span>
                     )}
                   </NavLink>
                 );
@@ -118,7 +139,7 @@ export default function Sidebar({
       {/* Sidebar Bottom */}
       <div className="sidebar-bottom">
         <div className="secure-note">
-          <ShieldCheck size={16} />
+          <ShieldCheck size={16} strokeWidth={1.9} />
 
           {!collapsed && (
             <span>Secure workspace</span>
@@ -131,8 +152,9 @@ export default function Sidebar({
           className="logout-btn"
           onClick={handleLogout}
           title="Logout"
+          aria-label="Logout"
         >
-          <LogOut size={17} />
+          <LogOut size={17} strokeWidth={1.9} />
 
           {!collapsed && (
             <span>Logout</span>
@@ -141,7 +163,8 @@ export default function Sidebar({
 
         {!collapsed && (
           <div className="sidebar-version">
-            VERSION <span>1.0.0</span>
+            <span>SPONSOR CRM</span>
+            <span className="version-number">VERSION 1.0.0</span>
           </div>
         )}
       </div>

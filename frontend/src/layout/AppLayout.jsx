@@ -34,12 +34,19 @@ export default function AppLayout({
     [location.pathname]
   );
 
+  const handleToggleSidebar = () => {
+    setCollapsed((value) => !value);
+  };
+
+  const handleCloseMobileMenu = () => {
+    setMobileOpen(false);
+  };
+
   const handleLogout = async () => {
     try {
       await api.logout();
     } catch (error) {
-      // Logout should still clear local authentication
-      // even if the backend request fails.
+      // Clear local authentication even if the API request fails.
       console.error('Logout API request failed:', error);
     } finally {
       onLogout?.();
@@ -48,34 +55,40 @@ export default function AppLayout({
 
   return (
     <div className="app-shell">
+      {/* Sidebar */}
       <Sidebar
         collapsed={collapsed}
         mobileOpen={mobileOpen}
-        onNavigate={() => setMobileOpen(false)}
+        onNavigate={handleCloseMobileMenu}
         onLogout={handleLogout}
+        onToggleCollapse={handleToggleSidebar}
       />
 
+      {/* Mobile navigation overlay */}
       {mobileOpen && (
         <button
           type="button"
           className="mobile-scrim"
           aria-label="Close navigation"
-          onClick={() => setMobileOpen(false)}
+          onClick={handleCloseMobileMenu}
         />
       )}
 
+      {/* Main content */}
       <main
         className={`main-area ${
           collapsed ? 'sidebar-collapsed' : ''
         }`}
       >
+        {/* Top navigation */}
         <header className="topbar">
           <div className="topbar-left">
             <button
               type="button"
               className="icon-button mobile-menu"
               onClick={() => setMobileOpen(true)}
-              aria-label="Open menu"
+              aria-label="Open navigation menu"
+              title="Open menu"
             >
               <Menu size={19} />
             </button>
@@ -83,31 +96,43 @@ export default function AppLayout({
             <button
               type="button"
               className="icon-button desktop-menu"
-              onClick={() => setCollapsed((value) => !value)}
-              aria-label="Toggle sidebar"
+              onClick={handleToggleSidebar}
+              aria-label={
+                collapsed ? 'Expand sidebar' : 'Collapse sidebar'
+              }
+              title={
+                collapsed ? 'Expand sidebar' : 'Collapse sidebar'
+              }
             >
               <Menu size={19} />
             </button>
 
+            {/* Breadcrumb */}
             <div className="breadcrumb">
               <span>Workspace</span>
               <span className="crumb-slash">/</span>
-              <strong>{current?.label || 'Overview'}</strong>
+              <strong>
+                {current?.label || 'Overview'}
+              </strong>
             </div>
           </div>
 
+          {/* Topbar actions */}
           <div className="topbar-actions">
+            {/* Search display */}
             <label className="global-search">
               <Search size={16} />
 
               <input
                 type="text"
                 placeholder="Search workspace..."
+                aria-label="Search workspace"
               />
 
               <kbd>⌘ K</kbd>
             </label>
 
+            {/* Theme toggle */}
             <button
               type="button"
               className="theme-toggle"
@@ -126,10 +151,12 @@ export default function AppLayout({
               </span>
             </button>
 
+            {/* Notifications */}
             <button
               type="button"
               className="icon-button notification-button"
               aria-label="Notifications"
+              title="Notifications"
             >
               <Bell size={18} />
               <i />
@@ -137,7 +164,7 @@ export default function AppLayout({
 
             <div className="topbar-divider" />
 
-            {/* Profile display only — no sign-out dropdown */}
+            {/* User profile */}
             <div
               className="profile-menu"
               aria-label={`Signed in as ${currentUser}`}
@@ -152,10 +179,12 @@ export default function AppLayout({
           </div>
         </header>
 
+        {/* Page content */}
         <div className="page-content">
           <Outlet />
         </div>
 
+        {/* Footer */}
         <footer className="app-footer">
           <span>© Sponsor CRM</span>
 

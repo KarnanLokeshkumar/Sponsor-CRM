@@ -9,7 +9,7 @@
   <name>Sponsor CRM API</name>
   <description>Backend API for Sponsor CRM</description>
   <parent>
-    <groupId>org.springframework.boot</groupId>
+    <groupId>org.springframework.boot</groupId>     
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>3.3.5</version>
     <relativePath/>
