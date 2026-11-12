@@ -1109,3 +1109,4 @@ export default function GenericModulePage() {
     </div>
   );
 }
+ 
