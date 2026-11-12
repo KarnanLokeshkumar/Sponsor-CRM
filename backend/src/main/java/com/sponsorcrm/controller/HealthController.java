@@ -10,9 +10,8 @@ public class HealthController {
     @GetMapping("/api/health")
     public Map<String, Object> health() {
         return Map.of(
-            "status", "UP",
-            "application", "Sponsor CRM API",
-            "timestamp", Instant.now().toString()
-        );
+                "status", "UP",
+                "application", "Sponsor CRM API",
+                "timestamp", Instant.now().toString());
     }
 }

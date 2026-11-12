@@ -1,6 +1,5 @@
 package com.sponsorcrm.auth;
 
-
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -24,140 +23,129 @@ import jakarta.validation.constraints.NotBlank;
 @RequestMapping("/api/admin/users")
 public class AdminUserController {
 
-    private final UserAccountRepository userRepository;
-    private final PasswordSetupTokenRepository tokenRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final EmailService emailService;
+        private final UserAccountRepository userRepository;
+        private final PasswordSetupTokenRepository tokenRepository;
+        private final PasswordEncoder passwordEncoder;
+        private final EmailService emailService;
 
-    private final SecureRandom secureRandom = new SecureRandom();
+        private final SecureRandom secureRandom = new SecureRandom();
 
-    public AdminUserController(
-            UserAccountRepository userRepository,
-            PasswordSetupTokenRepository tokenRepository,
-            PasswordEncoder passwordEncoder,
-            EmailService emailService) {
+        public AdminUserController(
+                        UserAccountRepository userRepository,
+                        PasswordSetupTokenRepository tokenRepository,
+                        PasswordEncoder passwordEncoder,
+                        EmailService emailService) {
 
-        this.userRepository = userRepository;
-        this.tokenRepository = tokenRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.emailService = emailService;
-    }
-
-    @PostMapping
-    public ResponseEntity<?> createUser(
-            @Valid @RequestBody CreateUserRequest request) {
-
-        String email = request.email()
-                .trim()
-                .toLowerCase();
-
-        // Check whether the account already exists.
-        if (userRepository.findByEmailIgnoreCase(email).isPresent()) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "An account with this email already exists"
-            );
+                this.userRepository = userRepository;
+                this.tokenRepository = tokenRepository;
+                this.passwordEncoder = passwordEncoder;
+                this.emailService = emailService;
         }
 
-        // Generate a random initial password.
-        // This password is never sent to the user.
-        byte[] randomPassword = new byte[32];
-        secureRandom.nextBytes(randomPassword);
+        @PostMapping
+        public ResponseEntity<?> createUser(
+                        @Valid @RequestBody CreateUserRequest request) {
 
-        String initialPassword = Base64.getUrlEncoder()
-                .withoutPadding()
-                .encodeToString(randomPassword);
+                String email = request.email()
+                                .trim()
+                                .toLowerCase();
 
-        // Create the user account.
-        UserAccount user = new UserAccount();
+                // Check whether the account already exists.
+                if (userRepository.findByEmailIgnoreCase(email).isPresent()) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.CONFLICT,
+                                        "An account with this email already exists");
+                }
 
-        user.setEmail(email);
-        user.setPasswordHash(
-                passwordEncoder.encode(initialPassword)
-        );
+                // Generate a random initial password.
+                // This password is never sent to the user.
+                byte[] randomPassword = new byte[32];
+                secureRandom.nextBytes(randomPassword);
 
-        user.setRole(
-                request.role() == null || request.role().isBlank()
-                        ? "USER"
-                        : request.role().trim().toUpperCase()
-        );
+                String initialPassword = Base64.getUrlEncoder()
+                                .withoutPadding()
+                                .encodeToString(randomPassword);
 
-        user.setActive(true);
+                // Create the user account.
+                UserAccount user = new UserAccount();
 
-        UserAccount savedUser = userRepository.save(user);
+                user.setEmail(email);
+                user.setPasswordHash(
+                                passwordEncoder.encode(initialPassword));
 
-        // Generate a secure password setup token.
-        byte[] tokenBytes = new byte[32];
-        secureRandom.nextBytes(tokenBytes);
+                user.setRole(
+                                request.role() == null || request.role().isBlank()
+                                                ? "USER"
+                                                : request.role().trim().toUpperCase());
 
-        String rawToken = Base64.getUrlEncoder()
-                .withoutPadding()
-                .encodeToString(tokenBytes);
+                user.setActive(true);
 
-        // Store only the hashed token.
-        PasswordSetupToken setupToken = new PasswordSetupToken();
+                UserAccount savedUser = userRepository.save(user);
 
-        setupToken.setUser(savedUser);
-        setupToken.setTokenHash(hashToken(rawToken));
-        setupToken.setExpiresAt(
-                LocalDateTime.now().plusMinutes(30)
-        );
-        setupToken.setUsed(false);
+                // Generate a secure password setup token.
+                byte[] tokenBytes = new byte[32];
+                secureRandom.nextBytes(tokenBytes);
 
-        tokenRepository.save(setupToken);
+                String rawToken = Base64.getUrlEncoder()
+                                .withoutPadding()
+                                .encodeToString(tokenBytes);
 
-        // Send the password setup email.
-        emailService.sendPasswordSetupEmail(
-                email,
-                rawToken
-        );
+                // Store only the hashed token.
+                PasswordSetupToken setupToken = new PasswordSetupToken();
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(
-                        Map.of(
-                                "message",
-                                "Account created. Password setup email sent.",
-                                "email",
-                                email
-                        )
-                );
-    }
+                setupToken.setUser(savedUser);
+                setupToken.setTokenHash(hashToken(rawToken));
+                setupToken.setExpiresAt(
+                                LocalDateTime.now().plusMinutes(30));
+                setupToken.setUsed(false);
 
-    /**
-     * Hashes the setup token using SHA-256.
-     */
-    private String hashToken(String token) {
+                tokenRepository.save(setupToken);
 
-        try {
-            MessageDigest digest =
-                    MessageDigest.getInstance("SHA-256");
+                // Send the password setup email.
+                emailService.sendPasswordSetupEmail(
+                                email,
+                                rawToken);
 
-            byte[] hash = digest.digest(
-                    token.getBytes(StandardCharsets.UTF_8)
-            );
-
-            return HexFormat.of().formatHex(hash);
-
-        } catch (NoSuchAlgorithmException exception) {
-
-            throw new IllegalStateException(
-                    "SHA-256 algorithm is unavailable",
-                    exception
-            );
+                return ResponseEntity
+                                .status(HttpStatus.CREATED)
+                                .body(
+                                                Map.of(
+                                                                "message",
+                                                                "Account created. Password setup email sent.",
+                                                                "email",
+                                                                email));
         }
-    }
 
-    /**
-     * Request body for creating a user account.
-     */
-    public record CreateUserRequest(
+        /**
+         * Hashes the setup token using SHA-256.
+         */
+        private String hashToken(String token) {
 
-            @NotBlank
-            @Email
-            String email,
+                try {
+                        MessageDigest digest = MessageDigest.getInstance("SHA-256");
 
-            String role
+                        byte[] hash = digest.digest(
+                                        token.getBytes(StandardCharsets.UTF_8));
 
-    ) {}
+                        return HexFormat.of().formatHex(hash);
+
+                } catch (NoSuchAlgorithmException exception) {
+
+                        throw new IllegalStateException(
+                                        "SHA-256 algorithm is unavailable",
+                                        exception);
+                }
+        }
+
+        /**
+         * Request body for creating a user account.
+         */
+        public record CreateUserRequest(
+
+                        @NotBlank @Email String email,
+
+                        String role
+
+        ) {
+        }
 }

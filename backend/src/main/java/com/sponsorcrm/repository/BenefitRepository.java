@@ -1,1 +1,7 @@
-package com.sponsorcrm.repository; import com.sponsorcrm.entity.Benefit; import org.springframework.data.jpa.repository.JpaRepository; public interface BenefitRepository extends JpaRepository<Benefit,Long> {}
+package com.sponsorcrm.repository;
+
+import com.sponsorcrm.entity.Benefit;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface BenefitRepository extends JpaRepository<Benefit, Long> {
+}

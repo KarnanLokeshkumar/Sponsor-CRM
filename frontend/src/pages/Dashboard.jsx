@@ -287,14 +287,7 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* Dashboard information */}
-      <div className="dashboard-footer-note">
-        <Activity size={16} />
-
-        <span>
-          Dashboard figures are loaded from the connected CRM APIs.
-        </span>
-      </div>
+      
     </div>
   );
 }

@@ -22,8 +22,7 @@ public class CorsConfig implements WebMvcConfigurer {
                         "PUT",
                         "PATCH",
                         "DELETE",
-                        "OPTIONS"
-                )
+                        "OPTIONS")
                 .allowedHeaders("*");
     }
 }

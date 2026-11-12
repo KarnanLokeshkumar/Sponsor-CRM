@@ -4,12 +4,9 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(
-    name = "password_setup_tokens",
-    indexes = {
+@Table(name = "password_setup_tokens", indexes = {
         @Index(name = "idx_password_setup_token_hash", columnList = "tokenHash")
-    }
-)
+})
 public class PasswordSetupToken {
 
     @Id

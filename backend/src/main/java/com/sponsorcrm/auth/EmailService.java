@@ -27,8 +27,7 @@ public class EmailService {
 
         String encodedToken = URLEncoder.encode(
                 token,
-                StandardCharsets.UTF_8
-        );
+                StandardCharsets.UTF_8);
 
         String setupLink = frontendUrl
                 + "/set-password?token="
@@ -42,13 +41,12 @@ public class EmailService {
 
         message.setText(
                 "Hello,\n\n"
-                + "An administrator has created a Sponsor CRM account for you.\n\n"
-                + "Use the link below to set your password:\n"
-                + setupLink
-                + "\n\n"
-                + "This link expires in 30 minutes and can only be used once.\n\n"
-                + "If you did not expect this email, please ignore it."
-        );
+                        + "An administrator has created a Sponsor CRM account for you.\n\n"
+                        + "Use the link below to set your password:\n"
+                        + setupLink
+                        + "\n\n"
+                        + "This link expires in 30 minutes and can only be used once.\n\n"
+                        + "If you did not expect this email, please ignore it.");
 
         mailSender.send(message);
     }
