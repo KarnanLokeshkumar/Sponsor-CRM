@@ -191,7 +191,7 @@ public class RecordSearchController {
                 builder.like(builder.lower(root.get("type")), pattern, '\\'),
                 builder.like(builder.lower(root.get("description")), pattern, '\\'),
                 builder.like(builder.lower(root.join("sponsor").get("name")), pattern, '\\'),
-                builder.like(builder.lower(root.join("campaign", jakarta.persistence.JoinType.LEFT)
+                builder.like(builder.lower(root.join("campaign", jakarta.persistence.criteria.JoinType.LEFT)
                         .get("name")), pattern, '\\'));
     }
 

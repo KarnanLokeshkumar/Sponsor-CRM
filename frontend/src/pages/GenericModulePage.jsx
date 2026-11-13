@@ -853,21 +853,25 @@ export default function GenericModulePage() {
           </div>
           <div className="module-status-bars">
             {[
-              { label: "Open", value: summary.open || 0, color: "#4f78b8" },
+              {
+                label: "Open",
+                value: summary.open || 0,
+                color: "var(--workflow-open)",
+              },
               {
                 label: "In progress",
                 value: summary.progress || 0,
-                color: "#8d77b4",
+                color: "var(--workflow-progress)",
               },
               {
                 label: "Completed",
                 value: summary.done || 0,
-                color: "#39977e",
+                color: "var(--workflow-completed)",
               },
               {
                 label: "Overdue",
                 value: summary.overdue || 0,
-                color: "#c28d48",
+                color: "var(--workflow-overdue)",
               },
             ].map((x) => (
               <div className="module-status-row" key={x.label}>

@@ -2940,6 +2940,10 @@ body,
   --navy2: #1C3970;
   --emerald: #2859C5;
   --emerald-dark: #1F469F;
+  --workflow-open: #3768C4;
+  --workflow-progress: #7561B5;
+  --workflow-completed: #2F8F72;
+  --workflow-overdue: #C78334;
   --gold: #AEB8C7;
   --ink: #17243A;
   --muted: #68778D;
@@ -2959,6 +2963,10 @@ body,
   --navy2: #142541;
   --emerald: #78A6F4;
   --emerald-dark: #5F91E8;
+  --workflow-open: #78A6F4;
+  --workflow-progress: #B39AE8;
+  --workflow-completed: #58C7A1;
+  --workflow-overdue: #E5AA5B;
   --gold: #AEBBD0;
   --ink: #EAF0FA;
   --muted: #A5B2C6;
@@ -3575,6 +3583,7 @@ tbody tr:hover {
 }
 .module-status-row > div > i {
   display: block;
+  background: var(--emerald);
   transform-origin: left center;
   animation: crm-bar-grow .9s cubic-bezier(.2,.7,.25,1) both;
   animation-delay: .32s;
