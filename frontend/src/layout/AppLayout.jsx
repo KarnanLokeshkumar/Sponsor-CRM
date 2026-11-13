@@ -1,7 +1,8 @@
-import { Outlet, useLocation } from 'react-router-dom';
-import { useMemo, useState } from 'react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import {
+  ArrowUpRight,
   Bell,
   Menu,
   Search,
@@ -12,7 +13,7 @@ import {
 
 import Sidebar from './Sidebar';
 import { api } from '../services/api';
-import { modules } from '../data/modules';
+import { moduleDescriptions, modules } from '../data/modules';
 
 export default function AppLayout({
   onLogout,
@@ -21,8 +22,13 @@ export default function AppLayout({
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const location = useLocation();
+  const navigate = useNavigate();
+  const searchContainerRef = useRef(null);
+  const searchInputRef = useRef(null);
 
   const currentUser =
     sessionStorage.getItem('sponsor-crm-user') ||
@@ -33,6 +39,61 @@ export default function AppLayout({
     () => modules.find((module) => module.path === location.pathname),
     [location.pathname]
   );
+
+  const searchResults = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+
+    if (!query) return [];
+
+    return modules
+      .filter((module) =>
+        [
+          module.label,
+          module.key,
+          module.group,
+          moduleDescriptions[module.key],
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase()
+          .includes(query)
+      )
+      .slice(0, 8);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        searchInputRef.current?.focus();
+        setSearchOpen(true);
+      }
+
+      if (event.key === 'Escape') {
+        setSearchOpen(false);
+      }
+    };
+
+    const handlePointerDown = (event) => {
+      if (!searchContainerRef.current?.contains(event.target)) {
+        setSearchOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('pointerdown', handlePointerDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('pointerdown', handlePointerDown);
+    };
+  }, []);
+
+  const openModule = (path) => {
+    navigate(path);
+    setSearchQuery('');
+    setSearchOpen(false);
+  };
 
   const handleToggleSidebar = () => {
     setCollapsed((value) => !value);
@@ -119,18 +180,74 @@ export default function AppLayout({
 
           {/* Topbar actions */}
           <div className="topbar-actions">
-            {/* Search display */}
-            <label className="global-search">
-              <Search size={16} />
+            {/* Workspace search */}
+            <div className="global-search-wrap" ref={searchContainerRef}>
+              <label className="global-search">
+                <Search size={16} />
 
-              <input
-                type="text"
-                placeholder="Search workspace..."
-                aria-label="Search workspace"
-              />
+                <input
+                  ref={searchInputRef}
+                  type="search"
+                  placeholder="Search workspace..."
+                  aria-label="Search workspace modules"
+                  aria-controls="workspace-search-results"
+                  aria-expanded={searchOpen && Boolean(searchQuery.trim())}
+                  onFocus={() => setSearchOpen(true)}
+                  onChange={(event) => {
+                    setSearchQuery(event.target.value);
+                    setSearchOpen(true);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' && searchResults[0]) {
+                      event.preventDefault();
+                      openModule(searchResults[0].path);
+                    }
 
-              <kbd>⌘ K</kbd>
-            </label>
+                    if (event.key === 'Escape') {
+                      setSearchOpen(false);
+                    }
+                  }}
+                />
+
+                <kbd>⌘ K</kbd>
+              </label>
+
+              {searchOpen && searchQuery.trim() && (
+                <div
+                  className="global-search-results"
+                  id="workspace-search-results"
+                  role="listbox"
+                  aria-label="Matching workspace modules"
+                >
+                  {searchResults.length ? (
+                    searchResults.map((module) => {
+                      const Icon = module.icon;
+
+                      return (
+                        <button
+                          type="button"
+                          className="global-search-result"
+                          key={module.key}
+                          role="option"
+                          onClick={() => openModule(module.path)}
+                        >
+                          <Icon size={16} aria-hidden="true" />
+                          <span className="global-search-result-copy">
+                            <b>{module.label}</b>
+                            <small>{module.group}</small>
+                          </span>
+                          <ArrowUpRight size={14} aria-hidden="true" />
+                        </button>
+                      );
+                    })
+                  ) : (
+                    <p className="global-search-empty" role="status">
+                      No matching workspace modules.
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* Theme toggle */}
             <button
@@ -155,8 +272,9 @@ export default function AppLayout({
             <button
               type="button"
               className="icon-button notification-button"
+              onClick={() => navigate('/notifications')}
               aria-label="Notifications"
-              title="Notifications"
+              title="Open notifications"
             >
               <Bell size={18} />
               <i />
