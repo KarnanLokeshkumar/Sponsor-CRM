@@ -150,6 +150,12 @@ export const api = {
     }),
 
   // Workspace Records
+  searchRecords: (query, { limit = 8, signal } = {}) =>
+    request(
+      `/search?${new URLSearchParams({ q: query, limit: String(limit) })}`,
+      { signal }
+    ),
+
   workspaceRecords: (moduleKey, params = {}) =>
     request(
       `/workspace/${moduleKey}?${new URLSearchParams(params)}`

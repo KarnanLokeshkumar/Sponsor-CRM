@@ -50,7 +50,9 @@ public class WorkspaceRecordController {
                     cb.like(cb.lower(root.get("title")), term),
                     cb.like(cb.lower(root.get("description")), term),
                     cb.like(cb.lower(root.get("owner")), term),
-                    cb.like(cb.lower(root.get("customFields")), term)));
+                    cb.like(cb.lower(root.get("customFields")), term),
+                    cb.like(cb.lower(root.get("status")), term),
+                    cb.like(cb.lower(root.get("priority")), term)));
         }
         if (!status.isBlank())
             spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), status));

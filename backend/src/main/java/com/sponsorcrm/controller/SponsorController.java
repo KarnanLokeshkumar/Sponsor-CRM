@@ -27,7 +27,11 @@ public class SponsorController {
         if (!search.isBlank())
             spec = spec.and((r, q, b) -> b.or(b.like(b.lower(r.get("name")), "%" + search.toLowerCase() + "%"),
                     b.like(b.lower(r.get("email")), "%" + search.toLowerCase() + "%"),
-                    b.like(b.lower(r.get("industry")), "%" + search.toLowerCase() + "%")));
+                    b.like(b.lower(r.get("industry")), "%" + search.toLowerCase() + "%"),
+                    b.like(b.lower(r.get("website")), "%" + search.toLowerCase() + "%"),
+                    b.like(b.lower(r.get("phone")), "%" + search.toLowerCase() + "%"),
+                    b.like(b.lower(r.get("city")), "%" + search.toLowerCase() + "%"),
+                    b.like(b.lower(r.get("notes")), "%" + search.toLowerCase() + "%")));
         if (!status.isBlank())
             spec = spec.and((r, q, b) -> b.equal(r.get("status"), status));
         if (!industry.isBlank())

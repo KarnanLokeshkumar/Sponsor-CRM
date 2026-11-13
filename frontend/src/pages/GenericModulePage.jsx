@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import {
   Plus,
   Search,
@@ -607,6 +607,7 @@ const emptyForm = () => ({
 
 export default function GenericModulePage() {
   const { module: key } = useParams();
+  const [searchParams] = useSearchParams();
   const item = modules.find((x) => x.key === key);
   const cfg = definitions[key];
   const [rows, setRows] = useState([]),
@@ -619,7 +620,7 @@ export default function GenericModulePage() {
       overdue: 0,
       highPriority: 0,
     });
-  const [search, setSearch] = useState(""),
+  const [search, setSearch] = useState(() => searchParams.get("search") || ""),
     [status, setStatus] = useState(""),
     [page, setPage] = useState(0),
     [totalPages, setTotalPages] = useState(0),
@@ -650,6 +651,13 @@ export default function GenericModulePage() {
       setBusy(false);
     }
   }, [key, search, status, page]);
+
+  useEffect(() => {
+    const searchFromUrl = searchParams.get("search") || "";
+    setSearch(searchFromUrl);
+    setPage(0);
+  }, [searchParams]);
+
   useEffect(() => {
     load();
   }, [load]);
@@ -941,10 +949,12 @@ export default function GenericModulePage() {
               ) : (
                 rows.map((r) => (
                   <tr key={r.id}>
-                    {cfg.fields.map(([k]) => (
-                      <td key={k}>{cell(r, k)}</td>
+                    {cfg.fields.map(([k, label]) => (
+                      <td key={k} data-label={label}>
+                        {cell(r, k)}
+                      </td>
                     ))}
-                    <td>
+                    <td data-label="Actions">
                       <button
                         className="row-more"
                         title="Edit"
@@ -1100,7 +1110,7 @@ export default function GenericModulePage() {
                 Cancel
               </button>
               <button type="submit" className="primary-button" disabled={busy}>
-                {busy ? "Saving…" : editing ? "Save changes" : "Create record"}
+                {busy ? "Saving…" : editing ? "Save changes" : "Submit"}
               </button>
             </div>
           </form>

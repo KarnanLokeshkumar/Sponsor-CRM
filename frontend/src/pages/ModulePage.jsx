@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 
 import {
   Plus,
@@ -129,6 +129,7 @@ const pretty = (value) =>
 
 export default function ModulePage() {
   const { module: key } = useParams();
+  const [searchParams] = useSearchParams();
 
   const item = modules.find((module) => module.key === key);
   const c = config[key];
@@ -144,7 +145,7 @@ export default function ModulePage() {
     inDiscussion: 0,
   });
 
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(() => searchParams.get('search') || '');
   const [status, setStatus] = useState('');
   const [industry, setIndustry] = useState('');
 
@@ -162,6 +163,12 @@ export default function ModulePage() {
 
   const [selected, setSelected] = useState(null);
   const [detailTab, setDetailTab] = useState('Overview');
+
+  useEffect(() => {
+    const search = searchParams.get('search') || '';
+    setQuery(search);
+    setPage(0);
+  }, [searchParams]);
 
   // Load module data
   const load = async () => {
@@ -760,7 +767,7 @@ export default function ModulePage() {
                     }
                   >
                     {c.columns.map((column) => (
-                      <td key={column[0]}>
+                      <td key={column[0]} data-label={column[1]}>
                         {column[0] === 'status' ? (
                           <span
                             className={`status-pill ${String(
@@ -790,7 +797,7 @@ export default function ModulePage() {
                       </td>
                     ))}
 
-                    <td>
+                    <td data-label="Actions">
                       <button
                         type="button"
                         className="row-more"
@@ -1017,7 +1024,7 @@ export default function ModulePage() {
                   ? 'Saving...'
                   : editing
                     ? 'Save changes'
-                    : 'Create record'}
+                    : 'Submit'}
               </button>
             </div>
           </form>

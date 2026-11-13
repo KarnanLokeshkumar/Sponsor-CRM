@@ -13,22 +13,35 @@ import {
 
 import Sidebar from './Sidebar';
 import { api } from '../services/api';
-import { moduleDescriptions, modules } from '../data/modules';
+import { modules } from '../data/modules';
 
 export default function AppLayout({
   onLogout,
   theme,
   onToggleTheme,
 }) {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(() =>
+    window.matchMedia('(min-width: 761px) and (max-width: 1024px)').matches
+  );
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
   const searchContainerRef = useRef(null);
   const searchInputRef = useRef(null);
+
+  useEffect(() => {
+    const compactDesktop = window.matchMedia(
+      '(min-width: 761px) and (max-width: 1024px)'
+    );
+    const updateSidebar = () => setCollapsed(compactDesktop.matches);
+
+    compactDesktop.addEventListener('change', updateSidebar);
+    return () => compactDesktop.removeEventListener('change', updateSidebar);
+  }, []);
 
   const currentUser =
     sessionStorage.getItem('sponsor-crm-user') ||
@@ -40,43 +53,71 @@ export default function AppLayout({
     [location.pathname]
   );
 
-  const searchResults = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchError, setSearchError] = useState('');
+  const [searching, setSearching] = useState(false);
 
-    if (!query) return [];
+  const query = searchQuery.trim();
 
-    return modules
-      .filter((module) =>
-        [
-          module.label,
-          module.key,
-          module.group,
-          moduleDescriptions[module.key],
-        ]
-          .filter(Boolean)
-          .join(' ')
-          .toLowerCase()
-          .includes(query)
-      )
-      .slice(0, 8);
-  }, [searchQuery]);
+  useEffect(() => {
+    if (query.length < 2) {
+      setSearchResults([]);
+      setSearchError('');
+      setSearching(false);
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => {
+      setSearching(true);
+      setSearchError('');
+
+      api.searchRecords(query, { signal: controller.signal })
+        .then((results) => setSearchResults(results))
+        .catch((error) => {
+          if (error.name !== 'AbortError') {
+            setSearchError(error.message);
+            setSearchResults([]);
+          }
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) {
+            setSearching(false);
+          }
+        });
+    }, 250);
+
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [query]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
-        searchInputRef.current?.focus();
+        if (window.matchMedia('(max-width: 900px)').matches) {
+          setMobileSearchOpen(true);
+        } else {
+          searchInputRef.current?.focus();
+        }
         setSearchOpen(true);
       }
 
       if (event.key === 'Escape') {
         setSearchOpen(false);
+        setMobileSearchOpen(false);
       }
     };
 
     const handlePointerDown = (event) => {
-      if (!searchContainerRef.current?.contains(event.target)) {
+      if (
+        !searchContainerRef.current?.contains(event.target) &&
+        !event.target.closest('.mobile-search-toggle')
+      ) {
         setSearchOpen(false);
+        setMobileSearchOpen(false);
       }
     };
 
@@ -89,10 +130,21 @@ export default function AppLayout({
     };
   }, []);
 
-  const openModule = (path) => {
-    navigate(path);
+  useEffect(() => {
+    if (mobileSearchOpen) {
+      searchInputRef.current?.focus();
+    }
+  }, [mobileSearchOpen]);
+
+  const openRecord = (record) => {
+    const params = new URLSearchParams({ search: query });
+    navigate({
+      pathname: `/${record.moduleKey}`,
+      search: `?${params.toString()}`,
+    });
     setSearchQuery('');
     setSearchOpen(false);
+    setMobileSearchOpen(false);
   };
 
   const handleToggleSidebar = () => {
@@ -101,6 +153,11 @@ export default function AppLayout({
 
   const handleCloseMobileMenu = () => {
     setMobileOpen(false);
+  };
+
+  const handleOpenMobileMenu = () => {
+    setCollapsed(false);
+    setMobileOpen(true);
   };
 
   const handleLogout = async () => {
@@ -147,7 +204,7 @@ export default function AppLayout({
             <button
               type="button"
               className="icon-button mobile-menu"
-              onClick={() => setMobileOpen(true)}
+              onClick={handleOpenMobileMenu}
               aria-label="Open navigation menu"
               title="Open menu"
             >
@@ -181,15 +238,20 @@ export default function AppLayout({
           {/* Topbar actions */}
           <div className="topbar-actions">
             {/* Workspace search */}
-            <div className="global-search-wrap" ref={searchContainerRef}>
+            <div
+              className={`global-search-wrap ${
+                mobileSearchOpen ? 'mobile-open' : ''
+              }`}
+              ref={searchContainerRef}
+            >
               <label className="global-search">
-                <Search size={16} />
+                <Search size={18} strokeWidth={2.25} aria-hidden="true" />
 
                 <input
                   ref={searchInputRef}
                   type="search"
-                  placeholder="Search workspace..."
-                  aria-label="Search workspace modules"
+                  placeholder="Search records..."
+                  aria-label="Search CRM records"
                   aria-controls="workspace-search-results"
                   aria-expanded={searchOpen && Boolean(searchQuery.trim())}
                   onFocus={() => setSearchOpen(true)}
@@ -200,7 +262,7 @@ export default function AppLayout({
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' && searchResults[0]) {
                       event.preventDefault();
-                      openModule(searchResults[0].path);
+                      openRecord(searchResults[0]);
                     }
 
                     if (event.key === 'Escape') {
@@ -217,24 +279,44 @@ export default function AppLayout({
                   className="global-search-results"
                   id="workspace-search-results"
                   role="listbox"
-                  aria-label="Matching workspace modules"
+                  aria-label="Matching CRM records"
                 >
-                  {searchResults.length ? (
-                    searchResults.map((module) => {
-                      const Icon = module.icon;
+                  {query.length < 2 ? (
+                    <p className="global-search-empty" role="status">
+                      Enter at least 2 characters to search records.
+                    </p>
+                  ) : searching ? (
+                    <p className="global-search-empty" role="status">
+                      Searching records…
+                    </p>
+                  ) : searchError ? (
+                    <p className="global-search-error" role="alert">
+                      Search failed: {searchError}
+                    </p>
+                  ) : searchResults.length ? (
+                    searchResults.map((record) => {
+                      const definition = modules.find(
+                        (item) => item.key === record.moduleKey
+                      );
+                      const Icon = definition?.icon || Search;
 
                       return (
                         <button
                           type="button"
                           className="global-search-result"
-                          key={module.key}
+                          key={`${record.moduleKey}-${record.id}`}
                           role="option"
-                          onClick={() => openModule(module.path)}
+                          onClick={() => openRecord(record)}
+                          aria-label={`${record.title}, ${definition?.label || record.moduleKey}`}
                         >
                           <Icon size={16} aria-hidden="true" />
                           <span className="global-search-result-copy">
-                            <b>{module.label}</b>
-                            <small>{module.group}</small>
+                            <b>{record.title}</b>
+                            <small>
+                              {definition?.label || record.moduleKey}
+                              {record.status ? ` · ${record.status.replaceAll('_', ' ')}` : ''}
+                              {record.detail ? ` · ${record.detail}` : ''}
+                            </small>
                           </span>
                           <ArrowUpRight size={14} aria-hidden="true" />
                         </button>
@@ -242,12 +324,26 @@ export default function AppLayout({
                     })
                   ) : (
                     <p className="global-search-empty" role="status">
-                      No matching workspace modules.
+                      No matching records.
                     </p>
                   )}
                 </div>
               )}
             </div>
+
+            <button
+              type="button"
+              className="icon-button mobile-search-toggle"
+              onClick={() => {
+                setMobileSearchOpen((open) => !open);
+                setSearchOpen(true);
+              }}
+              aria-label={mobileSearchOpen ? 'Close workspace search' : 'Open workspace search'}
+              aria-expanded={mobileSearchOpen}
+              title="Search workspace"
+            >
+              <Search size={19} strokeWidth={2.25} aria-hidden="true" />
+            </button>
 
             {/* Theme toggle */}
             <button
@@ -299,7 +395,7 @@ export default function AppLayout({
 
         {/* Page content */}
         <div className="page-content">
-          <Outlet />
+          <Outlet key={location.pathname} />
         </div>
 
         {/* Footer */}
