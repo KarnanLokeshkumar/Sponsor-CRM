@@ -529,7 +529,7 @@ export default function ModulePage() {
           </div>
 
           <h1>{c.title}</h1>
-          <p>{c.desc}</p>
+          <p>{c.desc}</p> 
         </div>
 
         <button
