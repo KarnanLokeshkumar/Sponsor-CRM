@@ -138,13 +138,7 @@ export default function Sidebar({
 
       {/* Sidebar Bottom */}
       <div className="sidebar-bottom">
-        <div className="secure-note">
-          <ShieldCheck size={16} strokeWidth={1.9} />
-
-          {!collapsed && (
-            <span>Secure workspace</span>
-          )}
-        </div>
+        
 
         {/* Logout */}
         <button

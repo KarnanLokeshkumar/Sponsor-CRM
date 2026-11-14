@@ -155,3 +155,9 @@ npm install
 npm run dev
 ```
 Frontend default API URL is `http://localhost:8080/api`; override it with `VITE_API_URL` in `frontend/.env` when required.
+
+## Install Sponsor CRM as a mobile app
+
+The frontend is an installable Progressive Web App (PWA). Serve it over HTTPS in production; `localhost` is supported for development. On Android, use the browser's **Install app** option. On iOS, open the site in Safari and choose **Share → Add to Home Screen**.
+
+The PWA caches the application shell and static assets for offline startup. CRM API requests and records are not cached; login and data operations require a network connection to the backend.

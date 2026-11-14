@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 import Login from './pages/Login';
@@ -55,6 +55,7 @@ const isSessionValid = () => {
 };
 
 export default function App() {
+  const navigate = useNavigate();
   const [authenticated, setAuthenticated] = useState(isSessionValid);
   const [theme, setTheme] = useState(
     () => localStorage.getItem(STORAGE_KEYS.theme) || 'light'
@@ -100,7 +101,12 @@ export default function App() {
   };
 
   const login = () => {
-    setAuthenticated(isSessionValid());
+    const valid = isSessionValid();
+    setAuthenticated(valid);
+
+    if (valid) {
+      navigate('/', { replace: true });
+    }
   };
 
   const logout = () => {

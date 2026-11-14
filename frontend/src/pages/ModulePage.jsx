@@ -3,11 +3,12 @@ import { useParams, useSearchParams } from 'react-router-dom';
 
 import {
   Plus,
-  Search,
   Pencil,
   Trash2,
   X,
-  RefreshCw,
+  Inbox,
+  LoaderCircle,
+  SearchX,
   Building2,
   Megaphone,
   Gift,
@@ -656,45 +657,20 @@ export default function ModulePage() {
       </section>
 
       {/* Records table */}
-      <section className="panel records-panel">
+      <section className="panel records-panel" aria-busy={busy}>
         <div className="panel-heading">
           <div>
             <h3>{c.title} directory</h3>
 
             <p>
-              Search and manage your OTT sponsorship records.
+              Review and manage your OTT sponsorship records.
             </p>
           </div>
-
-          <button
-            type="button"
-            className="secondary-button"
-            onClick={load}
-            disabled={busy}
-          >
-            <RefreshCw size={15} />
-            Refresh
-          </button>
         </div>
 
-        {/* Search and filters */}
-        <div className="table-toolbar">
-          <label className="table-search">
-            <Search size={16} />
-
-            <input
-              value={query}
-              onChange={(event) => {
-                setQuery(event.target.value);
-                setPage(0);
-              }}
-              placeholder={`Search ${c.title.toLowerCase()}...`}
-              aria-label={`Search ${c.title}`}
-            />
-          </label>
-
-          {key === 'sponsors' && (
-            <>
+        {/* Filters */}
+        {key === 'sponsors' && (
+          <div className="table-toolbar">
               <select
                 className="crm-filter"
                 value={industry}
@@ -726,9 +702,8 @@ export default function ModulePage() {
                   </option>
                 ))}
               </select>
-            </>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Table */}
         <div className="table-wrap">
@@ -752,7 +727,10 @@ export default function ModulePage() {
                     colSpan={c.columns.length + 1}
                     className="empty-table"
                   >
-                    Loading records...
+                    <div className="table-state table-state-loading" role="status">
+                      <LoaderCircle className="spin-animation" size={18} />
+                      <span>Loading records...</span>
+                    </div>
                   </td>
                 </tr>
               ) : (
@@ -834,8 +812,23 @@ export default function ModulePage() {
                     colSpan={c.columns.length + 1}
                     className="empty-table"
                   >
-                    No records found. Add your first{' '}
-                    {c.title.toLowerCase().replace(/s$/, '')}.
+                    <div className="table-state">
+                      {query || status || industry ? (
+                        <SearchX className="table-state-icon" size={22} />
+                      ) : (
+                        <Inbox className="table-state-icon" size={22} />
+                      )}
+                      <strong>
+                        {query || status || industry
+                          ? 'No matching records'
+                          : 'No records yet'}
+                      </strong>
+                      <span>
+                        {query || status || industry
+                          ? 'Try changing the global search or filters.'
+                          : `Add your first ${c.title.toLowerCase().replace(/s$/, '')} to get started.`}
+                      </span>
+                    </div>
                   </td>
                 </tr>
               )}

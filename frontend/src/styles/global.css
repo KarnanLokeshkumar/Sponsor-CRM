@@ -1188,6 +1188,40 @@ td:first-child {
   color: var(--muted);
   text-align: center !important;
 }
+.table-state {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  width: min(100%, 420px);
+  margin: 0 auto;
+  padding: 12px 8px;
+  white-space: normal;
+}
+.table-state-icon {
+  color: var(--primary);
+}
+.table-state strong {
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 700;
+}
+.table-state > span {
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.55;
+}
+.table-state-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+.table-state-loading svg {
+  flex: none;
+  color: var(--primary);
+}
 .clickable-row {
   cursor: pointer;
 }
@@ -4964,6 +4998,12 @@ body:has(.crm-modal-backdrop) .page-content {
     flex: 1 1 130px;
   }
 }
+@media (max-width: 640px) {
+  .crm-form-grid,
+  .module-page .crm-form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 @media (max-width: 480px) {
   .crm-modal-head h2,
   .module-page .crm-modal-head h2 {
@@ -4971,14 +5011,78 @@ body:has(.crm-modal-backdrop) .page-content {
   }
   .crm-modal-actions {
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .crm-modal-actions button {
     width: 100%;
+    min-width: 0;
   }
   .crm-field input,
   .crm-field select,
   .crm-field textarea {
     font-size: 16px;
+  }
+}
+@media (max-width: 600px) {
+  .crm-modal-backdrop {
+    padding: 0;
+    align-items: stretch;
+    justify-items: stretch;
+  }
+  .crm-modal,
+  .module-page .crm-modal {
+    width: 100%;
+    min-height: 100dvh;
+    max-height: 100dvh;
+    border-right: 0;
+    border-left: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .module-page .crm-modal {
+    padding: 0;
+  }
+  .module-page .crm-modal-head {
+    padding: max(14px, env(safe-area-inset-top, 0px)) 16px 14px;
+  }
+  .module-page .crm-form-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    padding: 16px;
+  }
+  .module-page .crm-modal-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    padding: 12px 16px max(16px, env(safe-area-inset-bottom, 0px));
+  }
+  .module-page .crm-modal-actions button {
+    width: 100%;
+    min-width: 0;
+    min-height: 48px;
+  }
+}
+
+.brand-row {
+  height: var(--topbar-height);
+  min-height: var(--topbar-height);
+  border-bottom-color: transparent;
+}
+:root[data-theme="dark"] .brand-row {
+  border-bottom-color: var(--line);
+}
+.topbar {
+  height: var(--topbar-height);
+  min-height: var(--topbar-height);
+  border-bottom-color: var(--line);
+}
+@media (max-width: 760px) {
+  :root {
+    --topbar-height: 66px;
+  }
+}
+@media (max-width: 600px) {
+  :root {
+    --topbar-height: 64px;
   }
 }

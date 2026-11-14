@@ -2,11 +2,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import {
   Plus,
-  Search,
   Pencil,
   Trash2,
   X,
-  RefreshCw,
+  Inbox,
+  LoaderCircle,
+  SearchX,
   ChevronLeft,
   ChevronRight,
   AlertTriangle,
@@ -792,7 +793,7 @@ export default function GenericModulePage() {
         </button>
       </div>
       {notice && (
-        <div className="crm-notice">
+        <div className="crm-notice" role="status">
           {notice}
           <button onClick={() => setNotice("")}>
             <X size={14} />
@@ -800,7 +801,7 @@ export default function GenericModulePage() {
         </div>
       )}
       {error && !modal && (
-        <div className="crm-error">
+        <div className="crm-error" role="alert">
           {error}
           <button onClick={() => setError("")}>
             <X size={14} />
@@ -894,31 +895,20 @@ export default function GenericModulePage() {
           </div>
         </section>
       </div>
-      <section className="panel records-panel module-records">
+      <section
+        className="panel records-panel module-records"
+        aria-busy={busy}
+      >
         <div className="panel-heading">
           <div>
             <h3>{cfg.noun} register</h3>
             <p>
-              Search, review and maintain saved {item.label.toLowerCase()}{" "}
+              Review and maintain saved {item.label.toLowerCase()}{" "}
               records.
             </p>
           </div>
-          <button className="secondary-button" onClick={load} disabled={busy}>
-            <RefreshCw size={15} /> Refresh
-          </button>
         </div>
         <div className="table-toolbar">
-          <label className="table-search">
-            <Search size={16} />
-            <input
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(0);
-              }}
-              placeholder={`Search ${item.label.toLowerCase()}...`}
-            />
-          </label>
           <select
             className="crm-filter"
             value={status}
@@ -948,7 +938,12 @@ export default function GenericModulePage() {
             <tbody>
               {busy && !rows.length ? (
                 <tr>
-                  <td colSpan={cfg.fields.length + 1}>Loading records…</td>
+                  <td colSpan={cfg.fields.length + 1} className="empty-table">
+                    <div className="table-state table-state-loading" role="status">
+                      <LoaderCircle className="spin-animation" size={18} />
+                      <span>Loading records…</span>
+                    </div>
+                  </td>
                 </tr>
               ) : (
                 rows.map((r) => (
@@ -980,8 +975,23 @@ export default function GenericModulePage() {
               {!busy && !rows.length && (
                 <tr>
                   <td colSpan={cfg.fields.length + 1} className="empty-table">
-                    No {item.label.toLowerCase()} records found. Add a record to
-                    get started.
+                    <div className="table-state">
+                      {search || status ? (
+                        <SearchX className="table-state-icon" size={22} />
+                      ) : (
+                        <Inbox className="table-state-icon" size={22} />
+                      )}
+                      <strong>
+                        {search || status
+                          ? "No matching records"
+                          : `No ${item.label.toLowerCase()} yet`}
+                      </strong>
+                      <span>
+                        {search || status
+                          ? "Try changing the global search or status filter."
+                          : `Add your first ${cfg.noun.toLowerCase()} to get started.`}
+                      </span>
+                    </div>
                   </td>
                 </tr>
               )}
