@@ -1,7 +1,8 @@
-import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 import Login from './pages/Login';
+import PasswordSetup from './pages/PasswordSetup';
 import AppLayout from './layout/AppLayout';
 import Dashboard from './pages/Dashboard';
 import ModulePage from './pages/ModulePage';
@@ -56,6 +57,7 @@ const isSessionValid = () => {
 
 export default function App() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [authenticated, setAuthenticated] = useState(isSessionValid);
   const [theme, setTheme] = useState(
     () => localStorage.getItem(STORAGE_KEYS.theme) || 'light'
@@ -113,6 +115,15 @@ export default function App() {
     clearAuthStorage();
     setAuthenticated(false);
   };
+
+  if (location.pathname === '/set-password') {
+    return (
+      <PasswordSetup
+        theme={theme}
+        onToggleTheme={toggleTheme}
+      />
+    );
+  }
 
   if (!authenticated) {
     return (

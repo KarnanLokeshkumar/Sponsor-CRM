@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 
 @Service
@@ -56,10 +57,11 @@ public class PasswordSetupService {
                                         "This account is inactive");
                 }
 
-                if (newPassword == null || newPassword.length() < 8) {
+                if (newPassword == null || newPassword.length() < 8
+                                || newPassword.getBytes(StandardCharsets.UTF_8).length > 72) {
                         throw new ResponseStatusException(
                                         HttpStatus.BAD_REQUEST,
-                                        "Password must contain at least 8 characters");
+                                        "Password must contain at least 8 characters and no more than 72 bytes");
                 }
 
                 user.setPasswordHash(passwordEncoder.encode(newPassword));

@@ -18,14 +18,27 @@ public class AuthController {
     private final UserAccountRepository users;
     private final AuthSessionRepository sessions;
     private final PasswordEncoder encoder;
+    private final PasswordSetupService passwordSetupService;
 
-    public AuthController(UserAccountRepository u, AuthSessionRepository s, PasswordEncoder e) {
+    public AuthController(
+            UserAccountRepository u,
+            AuthSessionRepository s,
+            PasswordEncoder e,
+            PasswordSetupService passwordSetupService
+    ) {
         users = u;
         sessions = s;
         encoder = e;
+        this.passwordSetupService = passwordSetupService;
     }
 
     public record LoginRequest(@NotBlank @Email String email, @NotBlank String password) {
+    }
+
+    public record PasswordSetupRequest(
+            @NotBlank String token,
+            @NotBlank @Size(min = 8, max = 72) String password
+    ) {
     }
 
     @PostMapping("/login")
@@ -44,6 +57,12 @@ public class AuthController {
         sessions.save(session);
         return Map.of("token", token, "email", user.getEmail(), "role", user.getRole(), "expiresAt",
                 session.getExpiresAt().toString());
+    }
+
+    @PostMapping("/set-password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void setupPassword(@Valid @RequestBody PasswordSetupRequest body) {
+        passwordSetupService.setupPassword(body.token(), body.password());
     }
 
     @PostMapping("/logout")

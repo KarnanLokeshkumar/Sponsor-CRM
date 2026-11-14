@@ -121,7 +121,9 @@ The application retains the dedicated Sponsor, Campaign, Deliverable and Benefit
 
 ### Authentication and first administrator
 
-The frontend now authenticates against `POST /api/auth/login`. The backend stores BCrypt password hashes and issues random opaque session tokens (12-hour expiry); the raw token is held only in browser session storage and sent as a Bearer token. Logout revokes the session. All API routes except login, health and error require authentication. User and audit-register workspace routes require the ADMIN role.
+The frontend now authenticates against `POST /api/auth/login`. The backend stores BCrypt password hashes and issues random opaque session tokens (12-hour expiry); the raw token is held only in browser session storage and sent as a Bearer token. Logout revokes the session. All API routes except login, password setup, health and error require authentication. User and audit-register workspace routes require the ADMIN role.
+
+Admin-created user accounts receive a password setup email. The link opens `/set-password?token=...` in the frontend and can be used once within 30 minutes. The frontend submits the token and new password to the public `POST /api/auth/set-password` endpoint; the backend stores only a hash of the token and a BCrypt hash of the password.
 
 Create the first administrator through environment variables before starting the backend. The bootstrap creates the account only if the email does not already exist:
 

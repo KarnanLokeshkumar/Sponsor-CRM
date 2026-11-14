@@ -25,10 +25,11 @@ public class Sponsor {
     @Column(length = 1500)
     private String notes;
     private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
     @PreUpdate
     public void touch() {
-        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -105,5 +106,9 @@ public class Sponsor {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 }

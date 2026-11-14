@@ -44,6 +44,7 @@ public class SecurityConfig {
                 // Public endpoints
                 .requestMatchers(
                     "/api/auth/login",
+                    "/api/auth/set-password",
                     "/api/health",
                     "/error"
                 ).permitAll()

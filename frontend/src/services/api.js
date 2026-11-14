@@ -83,6 +83,12 @@ export const api = {
       body: JSON.stringify(data),
     }),
 
+  setupPassword: (data) =>
+    request("/auth/set-password", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
   logout: () =>
     request("/auth/logout", {
       method: "POST",
