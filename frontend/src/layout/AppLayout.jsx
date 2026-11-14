@@ -309,7 +309,7 @@ export default function AppLayout({
                   onKeyDown={handleSearchKeyDown}
                 />
 
-                <kbd>Ctrl/⌘ K</kbd>
+              
               </label>
 
               {searchOpen && searchQuery.trim() && (

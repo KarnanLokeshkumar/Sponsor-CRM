@@ -154,7 +154,7 @@ export default function Sidebar({
           title="Logout"
           aria-label="Logout"
         >
-          <LogOut size={17} strokeWidth={1.9} />
+          <LogOut size={16} strokeWidth={2} />
 
           {!collapsed && (
             <span>Logout</span>

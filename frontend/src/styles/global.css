@@ -4859,3 +4859,126 @@ button:disabled {
     background: transparent;
   }
 }
+
+.sidebar .logout-btn {
+  min-height: 36px;
+  gap: 9px;
+  margin-top: 8px;
+  padding: 7px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.035);
+  color: #d7e1ef;
+  font-size: 12px;
+  font-weight: 600;
+}
+.sidebar .logout-btn:hover {
+  border-color: rgba(248, 113, 113, 0.28);
+  background: rgba(239, 68, 68, 0.13);
+  color: #fecaca;
+  transform: translateY(-1px);
+}
+.sidebar.collapsed .logout-btn {
+  width: 36px;
+  height: 36px;
+  margin: 8px auto 0;
+  padding: 0;
+  justify-content: center;
+}
+.crm-modal-backdrop {
+  top: 0;
+  z-index: 1104;
+  padding: clamp(8px, 2vw, 20px);
+  overflow-y: auto;
+}
+body:has(.crm-modal-backdrop) .main-area {
+  position: relative;
+  z-index: 1102;
+}
+body:has(.crm-modal-backdrop) .page-content {
+  position: relative;
+  z-index: 1103;
+}
+.crm-modal,
+.module-page .crm-modal {
+  width: min(720px, 100%);
+  min-width: 0;
+  max-height: calc(100dvh - 40px);
+}
+@supports (place-items: safe center) {
+  .crm-modal-backdrop {
+    place-items: safe center;
+  }
+}
+.crm-modal-head {
+  flex: none;
+  min-width: 0;
+}
+.crm-modal-head > div {
+  min-width: 0;
+}
+.crm-modal-head h2 {
+  overflow-wrap: anywhere;
+}
+.crm-modal-head .icon-button {
+  flex: none;
+  min-width: 40px;
+  min-height: 40px;
+}
+.crm-form-grid,
+.module-page .crm-form-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+}
+.crm-field {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.crm-field input,
+.crm-field select,
+.crm-field textarea {
+  min-width: 0;
+  max-width: 100%;
+}
+.crm-modal-actions {
+  min-width: 0;
+}
+@media (max-width: 760px) {
+  .crm-modal-backdrop {
+    padding: 8px;
+  }
+  .crm-modal,
+  .module-page .crm-modal {
+    width: 100%;
+    max-height: calc(100dvh - 16px);
+    border-radius: 14px;
+  }
+  .module-page .crm-modal-head,
+  .module-page .crm-form-grid,
+  .module-page .crm-modal-actions {
+    padding: 14px;
+  }
+  .crm-modal-actions {
+    flex-wrap: wrap;
+  }
+  .crm-modal-actions button {
+    flex: 1 1 130px;
+  }
+}
+@media (max-width: 480px) {
+  .crm-modal-head h2,
+  .module-page .crm-modal-head h2 {
+    font-size: 19px;
+  }
+  .crm-modal-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .crm-modal-actions button {
+    width: 100%;
+  }
+  .crm-field input,
+  .crm-field select,
+  .crm-field textarea {
+    font-size: 16px;
+  }
+}
