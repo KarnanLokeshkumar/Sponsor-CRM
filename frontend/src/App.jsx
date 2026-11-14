@@ -6,37 +6,49 @@ import AppLayout from './layout/AppLayout';
 import Dashboard from './pages/Dashboard';
 import ModulePage from './pages/ModulePage';
 
-const TOKEN_KEY = 'sponsor-crm-token';
-const USER_KEY = 'sponsor-crm-user';
-const EXPIRES_KEY = 'sponsor-crm-expires';
-const THEME_KEY = 'sponsor-crm-theme';
+const STORAGE_KEYS = {
+  token: 'sponsor-crm-token',
+  user: 'sponsor-crm-user',
+  expires: 'sponsor-crm-expires',
+  theme: 'sponsor-crm-theme',
+};
 
 const getStoredValue = (key) =>
   sessionStorage.getItem(key) || localStorage.getItem(key);
 
-const getToken = () => getStoredValue(TOKEN_KEY);
+const clearAuthStorage = () => {
+  ['token', 'user', 'expires'].forEach((key) => {
+    sessionStorage.removeItem(STORAGE_KEYS[key]);
+    localStorage.removeItem(STORAGE_KEYS[key]);
+  });
+};
+
+const getToken = () => getStoredValue(STORAGE_KEYS.token);
+const getExpiry = () => getStoredValue(STORAGE_KEYS.expires);
 
 const isSessionValid = () => {
   const token = getToken();
 
-  if (!token) {
+  if (!token || typeof token !== 'string' || token.trim() === '') {
     return false;
   }
 
-  const expires = getStoredValue(EXPIRES_KEY);
+  const expires = getExpiry();
 
-  // If the backend provides an expiry value, validate it.
-  // If no expiry is provided, allow the token and let the API validate it.
-  if (expires) {
-    const expiryDate = new Date(expires);
+  if (!expires) {
+    return true;
+  }
 
-    if (Number.isNaN(expiryDate.getTime())) {
-      return false;
-    }
+  const expiryDate = new Date(expires);
 
-    if (expiryDate <= new Date()) {
-      return false;
-    }
+  if (Number.isNaN(expiryDate.getTime())) {
+    clearAuthStorage();
+    return false;
+  }
+
+  if (expiryDate <= new Date()) {
+    clearAuthStorage();
+    return false;
   }
 
   return true;
@@ -44,15 +56,44 @@ const isSessionValid = () => {
 
 export default function App() {
   const [authenticated, setAuthenticated] = useState(isSessionValid);
-
   const [theme, setTheme] = useState(
-    () => localStorage.getItem(THEME_KEY) || 'light'
+    () => localStorage.getItem(STORAGE_KEYS.theme) || 'light'
   );
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
-    localStorage.setItem(THEME_KEY, theme);
+    localStorage.setItem(STORAGE_KEYS.theme, theme);
   }, [theme]);
+
+  useEffect(() => {
+    const handleStorage = (event) => {
+      if (!event.key) {
+        return;
+      }
+
+      const authKeys = [
+        STORAGE_KEYS.token,
+        STORAGE_KEYS.user,
+        STORAGE_KEYS.expires,
+      ];
+
+      if (authKeys.includes(event.key)) {
+        setAuthenticated(isSessionValid());
+      }
+    };
+
+    const handleAuthChange = () => {
+      setAuthenticated(isSessionValid());
+    };
+
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('sponsor-crm-auth-cleared', handleAuthChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('sponsor-crm-auth-cleared', handleAuthChange);
+    };
+  }, []);
 
   const toggleTheme = () => {
     setTheme((current) => (current === 'light' ? 'dark' : 'light'));
@@ -63,14 +104,7 @@ export default function App() {
   };
 
   const logout = () => {
-    sessionStorage.removeItem(TOKEN_KEY);
-    sessionStorage.removeItem(USER_KEY);
-    sessionStorage.removeItem(EXPIRES_KEY);
-
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
-    localStorage.removeItem(EXPIRES_KEY);
-
+    clearAuthStorage();
     setAuthenticated(false);
   };
 

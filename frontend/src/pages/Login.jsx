@@ -13,6 +13,24 @@ import {
 } from "lucide-react";
 import "../styles/Login.css";
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function persistAuth(result, rememberMe) {
+  const storage = rememberMe ? localStorage : sessionStorage;
+
+  [localStorage, sessionStorage].forEach((store) => {
+    if (store !== storage) {
+      store.removeItem("sponsor-crm-token");
+      store.removeItem("sponsor-crm-user");
+      store.removeItem("sponsor-crm-expires");
+    }
+  });
+
+  storage.setItem("sponsor-crm-token", result.token);
+  storage.setItem("sponsor-crm-user", result.email);
+  storage.setItem("sponsor-crm-expires", result.expiresAt);
+}
+
 export default function Login({ onLogin, theme, onToggleTheme }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,11 +39,22 @@ export default function Login({ onLogin, theme, onToggleTheme }) {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
+  const emailTrimmed = email.trim();
+  const emailValid = !emailTrimmed || EMAIL_PATTERN.test(emailTrimmed);
+  const passwordValid = password.length === 0 || password.trim().length > 0;
+
   async function submit(event) {
     event.preventDefault();
 
-    if (!email.trim() || !password.trim()) {
+    const nextEmail = email.trim();
+
+    if (!nextEmail || !password.trim()) {
       setError("Enter your email address and password.");
+      return;
+    }
+
+    if (!EMAIL_PATTERN.test(nextEmail)) {
+      setError("Enter a valid email address before signing in.");
       return;
     }
 
@@ -34,21 +63,15 @@ export default function Login({ onLogin, theme, onToggleTheme }) {
 
     try {
       const result = await api.login({
-        email: email.trim(),
+        email: nextEmail,
         password,
       });
 
-      const storage = rememberMe ? localStorage : sessionStorage;
-
-      storage.setItem("sponsor-crm-token", result.token);
-      storage.setItem("sponsor-crm-user", result.email);
-      storage.setItem("sponsor-crm-expires", result.expiresAt);
-
+      persistAuth(result, rememberMe);
       onLogin();
     } catch (err) {
-      setError(
-        err.message || "Unable to sign in. Please check your details."
-      );
+      const message = err?.message || "Unable to sign in. Please check your details.";
+      setError(message);
     } finally {
       setBusy(false);
     }
@@ -105,30 +128,43 @@ export default function Login({ onLogin, theme, onToggleTheme }) {
           </p>
 
           <form onSubmit={submit} noValidate>
-            <label className="reference-field">
+            <label
+              className={`reference-field ${email && !emailValid ? "invalid" : ""}`}
+            >
               <Mail size={20} />
 
               <input
                 type="email"
                 autoComplete="username"
                 value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                  if (error) setError("");
+                }}
                 placeholder="Email address"
                 aria-label="Email address"
+                aria-invalid={Boolean(email && !emailValid)}
+                autoCapitalize="none"
                 required
               />
             </label>
 
-            <label className="reference-field">
+            <label
+              className={`reference-field ${password && !passwordValid ? "invalid" : ""}`}
+            >
               <LockKeyhole size={20} />
 
               <input
                 type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
                 value={password}
-                onChange={(event) => setPassword(event.target.value)}
+                onChange={(event) => {
+                  setPassword(event.target.value);
+                  if (error) setError("");
+                }}
                 placeholder="Password"
                 aria-label="Password"
+                aria-invalid={Boolean(password && !passwordValid)}
                 required
               />
 
@@ -170,7 +206,7 @@ export default function Login({ onLogin, theme, onToggleTheme }) {
             <button
               className="reference-sign-in"
               type="submit"
-              disabled={busy}
+              disabled={busy || !email.trim() || !password.trim()}
             >
               <span>{busy ? "Signing in..." : "Sign In"}</span>
               {!busy && <ArrowRight size={20} />}

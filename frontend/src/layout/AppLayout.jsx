@@ -27,6 +27,7 @@ export default function AppLayout({
   const [searchQuery, setSearchQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [activeSearchIndex, setActiveSearchIndex] = useState(-1);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -64,16 +65,22 @@ export default function AppLayout({
       setSearchResults([]);
       setSearchError('');
       setSearching(false);
+      setActiveSearchIndex(-1);
       return undefined;
     }
 
     const controller = new AbortController();
-    const timer = window.setTimeout(() => {
-      setSearching(true);
-      setSearchError('');
+    setSearching(true);
+    setSearchResults([]);
+    setSearchError('');
+    setActiveSearchIndex(-1);
 
+    const timer = window.setTimeout(() => {
       api.searchRecords(query, { signal: controller.signal })
-        .then((results) => setSearchResults(results))
+        .then((results) => {
+          setSearchResults(results);
+          setActiveSearchIndex(-1);
+        })
         .catch((error) => {
           if (error.name !== 'AbortError') {
             setSearchError(error.message);
@@ -108,16 +115,19 @@ export default function AppLayout({
       if (event.key === 'Escape') {
         setSearchOpen(false);
         setMobileSearchOpen(false);
+        setMobileOpen(false);
+        setActiveSearchIndex(-1);
       }
     };
 
     const handlePointerDown = (event) => {
       if (
         !searchContainerRef.current?.contains(event.target) &&
-        !event.target.closest('.mobile-search-toggle')
+        !event.target.closest?.('.mobile-search-toggle')
       ) {
         setSearchOpen(false);
         setMobileSearchOpen(false);
+        setActiveSearchIndex(-1);
       }
     };
 
@@ -145,6 +155,33 @@ export default function AppLayout({
     setSearchQuery('');
     setSearchOpen(false);
     setMobileSearchOpen(false);
+    setActiveSearchIndex(-1);
+  };
+
+  const handleSearchKeyDown = (event) => {
+    if (event.key === 'ArrowDown' && searchResults.length) {
+      event.preventDefault();
+      setActiveSearchIndex((index) =>
+        index >= searchResults.length - 1 ? 0 : index + 1
+      );
+    }
+
+    if (event.key === 'ArrowUp' && searchResults.length) {
+      event.preventDefault();
+      setActiveSearchIndex((index) =>
+        index <= 0 ? searchResults.length - 1 : index - 1
+      );
+    }
+
+    if (event.key === 'Enter' && searchResults.length) {
+      event.preventDefault();
+      openRecord(searchResults[activeSearchIndex] || searchResults[0]);
+    }
+
+    if (event.key === 'Escape') {
+      setSearchOpen(false);
+      setActiveSearchIndex(-1);
+    }
   };
 
   const handleToggleSidebar = () => {
@@ -252,26 +289,27 @@ export default function AppLayout({
                   type="search"
                   placeholder="Search records..."
                   aria-label="Search CRM records"
+                  role="combobox"
+                  aria-autocomplete="list"
                   aria-controls="workspace-search-results"
                   aria-expanded={searchOpen && Boolean(searchQuery.trim())}
+                  aria-activedescendant={
+                    activeSearchIndex >= 0
+                      ? `workspace-search-result-${activeSearchIndex}`
+                      : undefined
+                  }
                   onFocus={() => setSearchOpen(true)}
                   onChange={(event) => {
                     setSearchQuery(event.target.value);
                     setSearchOpen(true);
+                    setSearchResults([]);
+                    setSearchError('');
+                    setActiveSearchIndex(-1);
                   }}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter' && searchResults[0]) {
-                      event.preventDefault();
-                      openRecord(searchResults[0]);
-                    }
-
-                    if (event.key === 'Escape') {
-                      setSearchOpen(false);
-                    }
-                  }}
+                  onKeyDown={handleSearchKeyDown}
                 />
 
-                <kbd>⌘ K</kbd>
+                <kbd>Ctrl/⌘ K</kbd>
               </label>
 
               {searchOpen && searchQuery.trim() && (
@@ -294,7 +332,7 @@ export default function AppLayout({
                       Search failed: {searchError}
                     </p>
                   ) : searchResults.length ? (
-                    searchResults.map((record) => {
+                    searchResults.map((record, index) => {
                       const definition = modules.find(
                         (item) => item.key === record.moduleKey
                       );
@@ -305,7 +343,10 @@ export default function AppLayout({
                           type="button"
                           className="global-search-result"
                           key={`${record.moduleKey}-${record.id}`}
+                          id={`workspace-search-result-${index}`}
                           role="option"
+                          aria-selected={index === activeSearchIndex}
+                          data-active={index === activeSearchIndex}
                           onClick={() => openRecord(record)}
                           aria-label={`${record.title}, ${definition?.label || record.moduleKey}`}
                         >

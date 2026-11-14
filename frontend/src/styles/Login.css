@@ -265,6 +265,12 @@
     0 0 20px rgba(0, 142, 255, 0.12);
 }
 
+.reference-field.invalid {
+  border-color: rgba(255, 145, 165, 0.8);
+  background: rgba(92, 18, 34, 0.22);
+  box-shadow: 0 0 0 3px rgba(255, 98, 128, 0.08);
+}
+
 .reference-field > svg {
   flex-shrink: 0;
 }

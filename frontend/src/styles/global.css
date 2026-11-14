@@ -410,7 +410,8 @@ kbd {
   text-align: left;
 }
 .global-search-result:hover,
-.global-search-result:focus-visible {
+.global-search-result:focus-visible,
+.global-search-result[data-active="true"] {
   outline: none;
   background: var(--hover-bg);
 }

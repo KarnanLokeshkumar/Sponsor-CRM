@@ -1,6 +1,23 @@
 const BASE_URL =
   import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
+const AUTH_STORAGE_KEYS = [
+  "sponsor-crm-token",
+  "sponsor-crm-user",
+  "sponsor-crm-expires",
+];
+
+const clearAuthStorage = () => {
+  AUTH_STORAGE_KEYS.forEach((key) => {
+    sessionStorage.removeItem(key);
+    localStorage.removeItem(key);
+  });
+
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("sponsor-crm-auth-cleared"));
+  }
+};
+
 async function request(path, options = {}) {
   // Read the token from either storage location.
   // Login uses localStorage when "Remember me" is checked,
@@ -9,44 +26,53 @@ async function request(path, options = {}) {
     sessionStorage.getItem("sponsor-crm-token") ||
     localStorage.getItem("sponsor-crm-token");
 
-  // Prepare request headers.
-  const headers = {
-    "Content-Type": "application/json",
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    ...options.headers,
-  };
+  const headers = new Headers(options.headers || {});
 
-  // Send the request.
+  if (!(options.body instanceof FormData) && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
+
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
   const response = await fetch(`${BASE_URL}${path}`, {
     ...options,
     headers,
   });
 
-  // Handle unsuccessful responses.
   if (!response.ok) {
+    const contentType = response.headers.get("content-type") || "";
     let message = `Request failed (${response.status})`;
 
     try {
-      const body = await response.json();
+      const body = contentType.includes("application/json")
+        ? await response.json()
+        : null;
 
-      message =
-        body.detail ||
-        body.message ||
-        body.error ||
-        message;
+      message = body?.detail || body?.message || body?.error || message;
     } catch {
       // Response does not contain a JSON body.
+    }
+
+    if (response.status === 401) {
+      clearAuthStorage();
     }
 
     throw new Error(message);
   }
 
-  // Handle responses without a body.
   if (response.status === 204) {
     return null;
   }
 
-  return response.json();
+  const contentType = response.headers.get("content-type") || "";
+
+  if (contentType.includes("application/json")) {
+    return response.json();
+  }
+
+  return response.text();
 }
 
 export const api = {
